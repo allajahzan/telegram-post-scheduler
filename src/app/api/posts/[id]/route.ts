@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { getSession } from '@/lib/auth';
 import { ObjectId } from 'mongodb';
+import { validateAndTransformImageUrl } from '@/lib/validation';
 
 export async function PATCH(
   request: Request,
@@ -22,6 +23,14 @@ export async function PATCH(
       return NextResponse.json({ message: 'Invalid post ID' }, { status: 400 });
     }
 
+    if (body.image_url) {
+      const validation = validateAndTransformImageUrl(body.image_url);
+      if (!validation.isValid) {
+        return NextResponse.json({ message: validation.reason }, { status: 400 });
+      }
+      body.image_url = validation.finalUrl;
+    }
+
     const db = await getDb();
     
     // Verify ownership
@@ -35,7 +44,7 @@ export async function PATCH(
     }
 
     // Only allow updating specific fields
-    const allowedFields = ['date', 'time', 'title', 'description', 'image_url', 'generate_image', 'status'];
+    const allowedFields = ['date', 'time', 'title', 'description', 'image_url', 'generate_image', 'prompt', 'status'];
     const updateData: any = { updated_at: new Date() };
 
     for (const field of allowedFields) {

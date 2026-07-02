@@ -14,7 +14,14 @@ export async function GET() {
     const db = await getDb();
     const user = await db.collection('users').findOne(
       { _id: new ObjectId(session.userId) },
-      { projection: { password: 0 } } // Exclude password from the response
+      { 
+        projection: { 
+          password: 0, 
+          linkedin_access_token: 0, 
+          linkedin_token_expires_at: 0,
+          linkedin_person_urn: 0
+        } 
+      }
     );
 
     if (!user) {

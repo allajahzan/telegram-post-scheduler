@@ -34,7 +34,7 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
         </div>
         <Badge 
           variant={isPending ? 'outline' : 'secondary'}
-          className={isPending ? 'border-[var(--color-status-pending)] text-[var(--color-status-pending)]' : 'bg-[var(--color-status-completed)] text-white hover:bg-[var(--color-status-completed)]/90'}
+          className={isPending ? 'border-(--color-status-pending) text-(--color-status-pending)' : 'bg-(--color-status-completed) text-white hover:bg-status-completed/90'}
         >
           {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
         </Badge>
@@ -62,10 +62,10 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 gap-2 border-t mt-auto">
+      <CardFooter className="p-4 pt-4 gap-2 border-t mt-auto">
         <Button 
           variant="secondary" 
-          className="w-full gap-2" 
+          className="flex-1 gap-2" 
           onClick={() => onEdit(post)}
         >
           <Edit className="size-4" />
@@ -73,7 +73,7 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
         </Button>
         <Button 
           variant="destructive" 
-          className="w-full gap-2" 
+          className="flex-1 gap-2" 
           onClick={() => onDelete(post)}
         >
           <Trash2 className="size-4" />

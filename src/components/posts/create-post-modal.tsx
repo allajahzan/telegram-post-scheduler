@@ -15,6 +15,7 @@ const postSchema = z.object({
   time: z.string().min(1, 'Time is required'),
   image_url: z.string().optional(),
   generate_image: z.boolean(),
+  prompt: z.string().optional(),
 });
 
 type PostFormValues = z.infer<typeof postSchema>;
@@ -57,7 +58,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
           <DialogDescription>
-            Schedule a new post for Telegram. It will be marked as pending.
+            Schedule a new post for LinkedIn. It will be marked as pending.
           </DialogDescription>
         </DialogHeader>
 
@@ -92,6 +93,16 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </div>
 
           <div className="space-y-2">
+            <label className="text-sm font-medium">AI Rewrite Prompt (Optional)</label>
+            <Textarea 
+              placeholder="Instructions for AI to rewrite title and description..." 
+              className="resize-none min-h-[60px]"
+              {...register('prompt')} 
+            />
+            {errors.prompt && <p className="text-xs text-destructive">{errors.prompt.message}</p>}
+          </div>
+
+          <div className="space-y-2">
             <label className="text-sm font-medium">Image URL (Optional)</label>
             <Input 
               placeholder="Paste Google Drive shareable link" 
@@ -101,19 +112,20 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             <p className="text-xs text-muted-foreground">Or leave blank and use AI generation</p>
           </div>
 
-          {!imageUrl && (
+          <div className="space-y-4">
             <div className="flex items-center space-x-2 border p-3 rounded-md bg-secondary/30">
               <input 
                 type="checkbox" 
                 id="generate_image" 
-                className="size-4 text-primary rounded"
+                className="size-4 text-primary rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!!imageUrl}
                 {...register('generate_image')} 
               />
-              <label htmlFor="generate_image" className="text-sm font-medium leading-none cursor-pointer">
+              <label htmlFor="generate_image" className={`text-sm font-medium leading-none ${!!imageUrl ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 Generate Image with AI
               </label>
             </div>
-          )}
+          </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t mt-4">
             <Button type="button" variant="outline" onClick={onClose}>

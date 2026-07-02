@@ -3,7 +3,7 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { Navbar } from '@/components/layout/navbar';
 import { useUser } from '@/hooks/use-auth';
-import { useUpdateName, useUpdatePassword } from '@/hooks/use-profile';
+import { useUpdateName } from '@/hooks/use-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,29 +16,14 @@ const nameSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
 });
 
-const passwordSchema = z.object({
-  current_password: z.string().min(1, 'Current password is required'),
-  new_password: z.string().min(6, 'New password must be at least 6 characters'),
-  confirm_password: z.string().min(1, 'Please confirm your new password'),
-}).refine((data) => data.new_password === data.confirm_password, {
-  message: "Passwords don't match",
-  path: ["confirm_password"],
-});
-
 type NameFormValues = z.infer<typeof nameSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function ProfilePage() {
   const { data: user } = useUser();
   const updateName = useUpdateName();
-  const updatePassword = useUpdatePassword();
 
   const nameForm = useForm<NameFormValues>({
     resolver: zodResolver(nameSchema),
-  });
-
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordSchema),
   });
 
   useEffect(() => {
@@ -51,28 +36,22 @@ export default function ProfilePage() {
     updateName.mutate(data);
   };
 
-  const onPasswordSubmit = (data: PasswordFormValues) => {
-    updatePassword.mutate({
-      current_password: data.current_password,
-      new_password: data.new_password,
-    }, {
-      onSuccess: () => {
-        passwordForm.reset();
-      }
-    });
-  };
-
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col">
         <Navbar />
         
         <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your account details and security
-            </p>
+          <div className="mb-8 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => window.location.href = '/dashboard'} className="shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
+              <p className="text-muted-foreground mt-1">
+                Manage your account details and security
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -83,61 +62,58 @@ export default function ProfilePage() {
                   Update your display name
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={nameForm.handleSubmit(onNameSubmit)} className="flex items-end gap-4 max-w-md">
-                  <div className="space-y-2 flex-1">
-                    <label className="text-sm font-medium">Name</label>
-                    <Input {...nameForm.register('name')} />
-                    {nameForm.formState.errors.name && (
-                      <p className="text-xs text-destructive">{nameForm.formState.errors.name.message}</p>
-                    )}
+              <CardContent className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                {user?.profile_picture ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img 
+                    src={user.profile_picture} 
+                    alt="Profile" 
+                    className="size-20 rounded-full object-cover border-4 border-muted shrink-0" 
+                  />
+                ) : (
+                  <div className="size-20 rounded-full bg-muted flex items-center justify-center border-4 border-background shrink-0">
+                    <span className="text-2xl text-muted-foreground font-semibold">
+                      {user?.name?.charAt(0) || 'U'}
+                    </span>
                   </div>
-                  <Button type="submit" disabled={updateName.isPending || !nameForm.formState.isDirty}>
-                    {updateName.isPending ? 'Saving...' : 'Save Name'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                )}
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Security</CardTitle>
-                <CardDescription>
-                  Change your password
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4 max-w-md">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Current Password</label>
-                    <Input type="password" {...passwordForm.register('current_password')} />
-                    {passwordForm.formState.errors.current_password && (
-                      <p className="text-xs text-destructive">{passwordForm.formState.errors.current_password.message}</p>
-                    )}
-                  </div>
+                <div className="flex-1 w-full max-w-md space-y-4">
+                  <form onSubmit={nameForm.handleSubmit(onNameSubmit)} className="flex items-end gap-4 w-full">
+                    <div className="space-y-2 flex-1">
+                      <label className="text-sm font-medium">Name</label>
+                      <Input {...nameForm.register('name')} />
+                      {nameForm.formState.errors.name && (
+                        <p className="text-xs text-destructive">{nameForm.formState.errors.name.message}</p>
+                      )}
+                    </div>
+                    <Button type="submit" disabled={updateName.isPending || !nameForm.formState.isDirty}>
+                      {updateName.isPending ? 'Saving...' : 'Save Name'}
+                    </Button>
+                  </form>
                   
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">New Password</label>
-                    <Input type="password" {...passwordForm.register('new_password')} />
-                    {passwordForm.formState.errors.new_password && (
-                      <p className="text-xs text-destructive">{passwordForm.formState.errors.new_password.message}</p>
-                    )}
+                  <div className="space-y-2 w-full">
+                    <label className="text-sm font-medium text-muted-foreground">Email (from LinkedIn)</label>
+                    <Input value={user?.email || ''} readOnly disabled className="bg-muted/50 cursor-not-allowed" />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Confirm New Password</label>
-                    <Input type="password" {...passwordForm.register('confirm_password')} />
-                    {passwordForm.formState.errors.confirm_password && (
-                      <p className="text-xs text-destructive">{passwordForm.formState.errors.confirm_password.message}</p>
-                    )}
+                  <div className="space-y-2 w-full">
+                    <label className="text-sm font-medium text-muted-foreground">Joined On</label>
+                    <Input 
+                      value={user?.created_at ? new Date(user.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : ''} 
+                      readOnly 
+                      disabled 
+                      className="bg-muted/50 cursor-not-allowed" 
+                    />
                   </div>
-
-                  <Button type="submit" disabled={updatePassword.isPending}>
-                    {updatePassword.isPending ? 'Updating...' : 'Update Password'}
-                  </Button>
-                </form>
+                </div>
               </CardContent>
             </Card>
+
           </div>
         </main>
       </div>

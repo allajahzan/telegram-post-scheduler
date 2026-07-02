@@ -31,7 +31,7 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Your Posts</h1>
               <p className="text-muted-foreground mt-1">
-                Manage your scheduled Telegram posts ({postCount}/3 used)
+                Manage your scheduled LinkedIn posts ({postCount}/3 used)
               </p>
             </div>
             
@@ -65,7 +65,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
                   <p className="text-muted-foreground max-w-sm mb-6">
-                    Create your first post to start automating your Telegram workflow.
+                    Create your first post to start automating your LinkedIn workflow.
                   </p>
                   <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
                     <Plus className="size-4" />

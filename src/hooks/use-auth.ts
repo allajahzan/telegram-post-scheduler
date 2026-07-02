@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 export interface User {
   name: string;
   email: string;
-  telegram_chat_id: string;
+  created_at: string;
+  profile_picture?: string;
 }
 
 export const useUser = () => {
@@ -17,46 +18,6 @@ export const useUser = () => {
       return data.user;
     },
     retry: false,
-  });
-};
-
-export const useLogin = () => {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
-  return useMutation({
-    mutationFn: async (credentials: Record<string, string>) => {
-      const { data } = await api.post('/auth/login', credentials);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.push('/dashboard');
-      toast.success('Logged in successfully');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to login');
-    },
-  });
-};
-
-export const useSignup = () => {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
-  return useMutation({
-    mutationFn: async (userData: Record<string, string>) => {
-      const { data } = await api.post('/auth/signup', userData);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.push('/dashboard');
-      toast.success('Account created successfully');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to sign up');
-    },
   });
 };
 

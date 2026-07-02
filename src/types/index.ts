@@ -4,8 +4,11 @@ export interface UserDocument {
   _id?: ObjectId;
   name: string;
   email: string;
-  password: string;
-  telegram_chat_id: string;
+  password?: string;
+  linkedin_access_token?: string;
+  linkedin_person_urn?: string;
+  linkedin_token_expires_at?: Date;
+  profile_picture?: string;
   created_at: Date;
 }
 
@@ -18,6 +21,7 @@ export interface PostDocument {
   description: string;
   image_url: string;
   generate_image: boolean;
+  prompt?: string;
   status: 'pending' | 'completed';
   created_at: Date;
   updated_at: Date;

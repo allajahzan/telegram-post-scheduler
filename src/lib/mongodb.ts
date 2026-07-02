@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient } from "mongodb";
 
 if (!process.env.MOONGO_DB_CS) {
   throw new Error('Invalid/Missing environment variable: "MOONGO_DB_CS"');
@@ -10,7 +10,7 @@ const options = {};
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
   let globalWithMongo = global as typeof globalThis & {
@@ -34,6 +34,6 @@ export default clientPromise;
 
 export async function getDb() {
   const client = await clientPromise;
-  const dbName = process.env.MONGODB_DB || 'telegram_scheduler_db';
+  const dbName = process.env.MONGODB_DB;
   return client.db(dbName);
 }

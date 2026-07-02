@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Telegram Post Scheduler",
-  description: "Manage scheduled posts for Telegram workflow",
+  title: "LinkedIn Post Scheduler",
+  description: "Manage scheduled posts for LinkedIn workflow",
 };
 
 export default function RootLayout({
@@ -25,6 +25,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} font-sans h-full antialiased`}
     >
+      <head>
+        <link rel="icon" href="/logo.png" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ClientOnly>
           <QueryProvider>

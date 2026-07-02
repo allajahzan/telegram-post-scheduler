@@ -10,6 +10,7 @@ export interface Post {
   description: string;
   image_url: string;
   generate_image: boolean;
+  prompt?: string;
   status: 'pending' | 'completed';
 }
 

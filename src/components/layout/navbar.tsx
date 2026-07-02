@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useUser, useLogout } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Send, LogOut, User as UserIcon } from 'lucide-react';
+import { Briefcase, LogOut, User as UserIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function Navbar() {
@@ -17,16 +17,22 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Send className="size-6 text-primary" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Logo" className="h-7 w-auto object-contain" />
           <Link href="/dashboard" className="text-xl font-bold text-primary tracking-tight">
-            Telegram Scheduler
+            LinkedIn Scheduler
           </Link>
         </div>
         
         <div className="flex items-center gap-4">
           <Link href="/profile">
             <Button variant={pathname === '/profile' ? 'secondary' : 'ghost'} size="sm" className="gap-2">
-              <UserIcon className="size-4" />
+              {user.profile_picture ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.profile_picture} alt="Profile" className="size-5 rounded-full object-cover" />
+              ) : (
+                <UserIcon className="size-4" />
+              )}
               <span className="hidden sm:inline-block">{user.name}</span>
             </Button>
           </Link>

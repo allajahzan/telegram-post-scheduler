@@ -3,6 +3,7 @@ import { getDb } from '@/lib/mongodb';
 import { getSession } from '@/lib/auth';
 import { ObjectId } from 'mongodb';
 import { PostDocument } from '@/types';
+import { validateAndTransformImageUrl } from '@/lib/validation';
 
 export async function GET() {
   try {
@@ -33,10 +34,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { date, time, title, description, image_url, generate_image } = await request.json();
+    const { date, time, title, description, image_url, generate_image, prompt } = await request.json();
 
     if (!date || !time || !title || !description) {
       return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+    }
+
+    let finalImageUrl = image_url || '';
+    if (finalImageUrl) {
+      const validation = validateAndTransformImageUrl(finalImageUrl);
+      if (!validation.isValid) {
+        return NextResponse.json({ message: validation.reason }, { status: 400 });
+      }
+      finalImageUrl = validation.finalUrl;
     }
 
     const db = await getDb();
@@ -57,8 +67,9 @@ export async function POST(request: Request) {
       time,
       title,
       description,
-      image_url: image_url || '',
+      image_url: finalImageUrl,
       generate_image: generate_image || false,
+      prompt: prompt || '',
       status: 'pending',
       created_at: new Date(),
       updated_at: new Date(),
