@@ -43,6 +43,10 @@ export async function PATCH(
       return NextResponse.json({ message: 'Post not found or unauthorized' }, { status: 404 });
     }
 
+    if (existingPost.status === 'done') {
+      return NextResponse.json({ message: 'Cannot edit a post that has already been published.' }, { status: 403 });
+    }
+
     // Only allow updating specific fields
     const allowedFields = ['date', 'time', 'title', 'description', 'image_url', 'generate_image', 'prompt', 'status'];
     const updateData: any = { updated_at: new Date() };
@@ -86,12 +90,12 @@ export async function DELETE(
 
     const db = await getDb();
     
-    const result = await db.collection('posts').deleteOne({ 
-      _id: new ObjectId(id),
-      user_id: new ObjectId(session.userId) 
-    });
+    const result = await db.collection('posts').updateOne(
+      { _id: new ObjectId(id), user_id: new ObjectId(session.userId) },
+      { $set: { is_deleted: true, updated_at: new Date() } }
+    );
 
-    if (result.deletedCount === 0) {
+    if (result.matchedCount === 0) {
       return NextResponse.json({ message: 'Post not found or unauthorized' }, { status: 404 });
     }
 

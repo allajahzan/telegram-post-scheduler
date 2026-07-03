@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 export interface UserDocument {
   _id?: ObjectId;
@@ -22,7 +22,19 @@ export interface PostDocument {
   image_url: string;
   generate_image: boolean;
   prompt?: string;
-  status: 'pending' | 'completed';
+  status: "pending" | "done";
+  is_deleted?: boolean;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface NotificationDocument {
+  _id?: ObjectId;
+  user_id: ObjectId | null;
+  post_id: ObjectId | null;
+  type: "error" | "success" | "warning";
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: Date;
 }

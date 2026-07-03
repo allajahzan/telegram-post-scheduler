@@ -3,6 +3,7 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { Navbar } from '@/components/layout/navbar';
 import { usePosts, Post } from '@/hooks/use-posts';
+import { useUser } from '@/hooks/use-auth';
 import { PostCard } from '@/components/posts/post-card';
 import { CreatePostModal } from '@/components/posts/create-post-modal';
 import { EditPostModal } from '@/components/posts/edit-post-modal';
@@ -12,14 +13,32 @@ import { Plus, Inbox, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function DashboardPage() {
-  const { data: posts, isLoading } = usePosts();
+  const { data: posts, isLoading: isPostsLoading } = usePosts();
+  const { data: userData, isLoading: isUserLoading } = useUser();
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [deletingPost, setDeletingPost] = useState<Post | null>(null);
 
-  const postCount = posts?.length || 0;
-  const isLimitReached = postCount >= 3;
+  const quota = userData?.quota || { used: 0, limit: 3, next_reset_at: null };
+  const isLimitReached = quota.used >= quota.limit;
+  
+  // Format the next reset time if available
+  let nextResetText = '';
+  if (isLimitReached && quota.next_reset_at) {
+    const resetDate = new Date(quota.next_reset_at);
+    const hoursLeft = Math.max(0, Math.ceil((resetDate.getTime() - Date.now()) / (1000 * 60 * 60)));
+    
+    if (hoursLeft > 24) {
+      const days = Math.floor(hoursLeft / 24);
+      nextResetText = `Quota resets in ${days} ${days === 1 ? 'day' : 'days'}`;
+    } else {
+      nextResetText = `Quota resets in ${hoursLeft} ${hoursLeft === 1 ? 'hour' : 'hours'}`;
+    }
+  }
+
+  const isLoading = isPostsLoading || isUserLoading;
+  const activePostCount = posts?.length || 0;
 
   return (
     <ProtectedRoute>
@@ -31,7 +50,7 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Your Posts</h1>
               <p className="text-muted-foreground mt-1">
-                Manage your scheduled LinkedIn posts ({postCount}/3 used)
+                Manage your scheduled LinkedIn posts ({quota.used}/{quota.limit} used in last 3 days)
               </p>
             </div>
             
@@ -46,7 +65,7 @@ export default function DashboardPage() {
               </Button>
               {isLimitReached && (
                 <span className="text-xs text-destructive font-medium">
-                  You've reached the 3-post limit.
+                  {nextResetText || 'You have reached the 3-post limit.'}
                 </span>
               )}
             </div>
@@ -58,7 +77,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              {postCount === 0 ? (
+              {activePostCount === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl bg-muted/30">
                   <div className="bg-primary/10 p-4 rounded-full mb-4">
                     <Inbox className="size-10 text-primary" />
@@ -67,7 +86,7 @@ export default function DashboardPage() {
                   <p className="text-muted-foreground max-w-sm mb-6">
                     Create your first post to start automating your LinkedIn workflow.
                   </p>
-                  <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
+                  <Button onClick={() => setIsCreateModalOpen(true)} disabled={isLimitReached} className="gap-2">
                     <Plus className="size-4" />
                     Create New Post
                   </Button>

@@ -1,18 +1,20 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'fallback_secret_key_that_should_not_be_used_in_production_min_32_chars'
-);
+const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function proxy(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get("token")?.value;
 
-  // Protect /dashboard and /profile routes
-  if (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/profile')) {
+  // Protect /dashboard, /profile, and /notifications routes
+  if (
+    request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/profile") ||
+    request.nextUrl.pathname.startsWith("/notifications")
+  ) {
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
     try {
@@ -21,20 +23,20 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     } catch (error) {
       // Invalid token
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      response.cookies.delete('token'); // clear invalid token
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("token"); // clear invalid token
       return response;
     }
   }
 
-  // Optional: Prevent logged in users from accessing login/signup
-  if (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup') {
+  // Optional: Prevent logged in users from accessing login
+  if (request.nextUrl.pathname === "/login") {
     if (token) {
       try {
         await jwtVerify(token, SECRET_KEY);
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
       } catch (error) {
-        // Token is invalid, let them proceed to login/signup
+        // Token is invalid, let them proceed to login
       }
     }
   }
@@ -43,5 +45,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/login', '/signup'],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/notifications/:path*", "/login"],
 };

@@ -41,6 +41,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
+    if (status === 'done') {
+      const post = await db.collection("posts").findOne({ _id: new ObjectId(post_id) });
+      if (post && post.user_id) {
+        await db.collection("notifications").insertOne({
+          user_id: post.user_id,
+          post_id: post._id,
+          type: "success",
+          title: "Post Published Successfully",
+          message: `Your post '${post.title}' was published to LinkedIn successfully.`,
+          is_read: false,
+          created_at: new Date()
+        });
+      }
+    }
+
     return NextResponse.json({
       success: true,
       matchedCount: result.matchedCount,

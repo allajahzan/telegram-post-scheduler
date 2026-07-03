@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useUser, useLogout } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Briefcase, LogOut, User as UserIcon } from 'lucide-react';
+import { Briefcase, LogOut, User as UserIcon, Bell } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function Navbar() {
-  const { data: user } = useUser();
+  const { data } = useUser();
+  const user = data?.user;
   const logout = useLogout();
   const pathname = usePathname();
 
@@ -24,7 +25,12 @@ export function Navbar() {
           </Link>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link href="/notifications">
+            <Button variant={pathname === '/notifications' ? 'secondary' : 'ghost'} size="icon" className="relative">
+              <Bell className="size-5" />
+            </Button>
+          </Link>
           <Link href="/profile">
             <Button variant={pathname === '/profile' ? 'secondary' : 'ghost'} size="sm" className="gap-2">
               {user.profile_picture ? (

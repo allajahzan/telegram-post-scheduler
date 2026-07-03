@@ -15,7 +15,10 @@ export async function GET() {
 
     const db = await getDb();
     const posts = await db.collection<PostDocument>('posts')
-      .find({ user_id: new ObjectId(session.userId) })
+      .find({ 
+        user_id: new ObjectId(session.userId),
+        is_deleted: { $ne: true }
+      })
       .sort({ date: 1, time: 1 }) // Sort by date then time ascending
       .toArray();
 
@@ -51,13 +54,17 @@ export async function POST(request: Request) {
 
     const db = await getDb();
     
-    // Critical Logic: Enforce 3-post limit
-    const postCount = await db.collection<PostDocument>('posts').countDocuments({ user_id: new ObjectId(session.userId) });
+    // Critical Logic: Enforce 3-day rolling quota limit
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    const postCount = await db.collection<PostDocument>('posts').countDocuments({ 
+      user_id: new ObjectId(session.userId),
+      created_at: { $gte: threeDaysAgo }
+    });
     
     if (postCount >= 3) {
       return NextResponse.json(
-        { message: 'You can only have 3 posts at a time. Delete or update an existing post first.' }, 
-        { status: 400 }
+        { message: 'You have reached your limit of 3 posts per 72 hours. Please wait until your quota resets.' }, 
+        { status: 403 }
       );
     }
 

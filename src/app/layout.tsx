@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LinkedIn Post Scheduler",
+  title: "Post Scheduler-LinkedIn",
   description: "Manage scheduled posts for LinkedIn workflow",
 };
 

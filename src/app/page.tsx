@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export default function RootPage() {
-  const { data: user, isLoading } = useUser();
+  const { data, isLoading } = useUser();
+  const user = data?.user;
   const router = useRouter();
 
   useEffect(() => {

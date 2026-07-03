@@ -8,7 +8,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const { data: user, isLoading } = useUser();
+  const { data, isLoading } = useUser();
+  const user = data?.user;
   const router = useRouter();
 
   useEffect(() => {

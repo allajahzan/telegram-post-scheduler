@@ -19,7 +19,8 @@ const nameSchema = z.object({
 type NameFormValues = z.infer<typeof nameSchema>;
 
 export default function ProfilePage() {
-  const { data: user } = useUser();
+  const { data } = useUser();
+  const user = data?.user;
   const updateName = useUpdateName();
 
   const nameForm = useForm<NameFormValues>({

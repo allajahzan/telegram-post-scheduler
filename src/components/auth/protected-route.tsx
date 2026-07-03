@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { data: user, isLoading, isError } = useUser();
+  const { data, isLoading, isError } = useUser();
+  const user = data?.user;
   const router = useRouter();
 
   useEffect(() => {

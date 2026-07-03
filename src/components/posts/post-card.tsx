@@ -40,7 +40,7 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
         </Badge>
       </CardHeader>
 
-      <CardContent className="p-4 pt-2 flex-grow">
+      <CardContent className="p-4 pt-2 grow">
         <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
           {post.description}
         </p>
@@ -67,6 +67,8 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           variant="secondary" 
           className="flex-1 gap-2" 
           onClick={() => onEdit(post)}
+          disabled={!isPending}
+          title={!isPending ? "Cannot edit a published post" : "Edit post"}
         >
           <Edit className="size-4" />
           Edit

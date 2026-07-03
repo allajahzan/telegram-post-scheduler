@@ -10,12 +10,18 @@ export interface User {
   profile_picture?: string;
 }
 
+export interface Quota {
+  used: number;
+  limit: number;
+  next_reset_at: string | null;
+}
+
 export const useUser = () => {
   return useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      const { data } = await api.get<{ user: User }>('/user/me');
-      return data.user;
+      const { data } = await api.get<{ user: User, quota: Quota }>('/user/me');
+      return data;
     },
     retry: false,
   });
