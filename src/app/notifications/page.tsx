@@ -59,8 +59,9 @@ export default function NotificationsPage() {
 
         <div className="mt-8 space-y-4">
           {isLoading ? (
-            <div className="flex justify-center py-20">
-              <Loader2 className="size-8 animate-spin text-primary" />
+            <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <Loader2 className="size-8 animate-spin mb-4 text-primary" />
+              <p>Loading your notifications...</p>
             </div>
           ) : data?.pages[0].notifications.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border bg-secondary/30 p-8 text-center">
@@ -75,21 +76,21 @@ export default function NotificationsPage() {
                   {page.notifications.map((notification) => (
                     <div
                       key={notification._id}
-                      className={`rounded-xl border p-4 sm:p-5 transition-colors ${
+                      className={`rounded-xl border p-5 transition-colors ${
                         !notification.is_read
                           ? "border-primary/20 bg-primary/5"
                           : "border-border/50 bg-card/40 hover:bg-card/60"
                       }`}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-2">
                         <div className="shrink-0 mt-0.5">
                           {getIcon(notification.type)}
                         </div>
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <h3 className="font-semibold text-foreground text-[15px]">
+                        <div className="flex flex-col min-w-0">
+                          <h3 className="font-semibold text-foreground text-sm">
                             {notification.title}
                           </h3>
-                          <p className="text-[14px] text-muted-foreground leading-relaxed wrap-break-word">
+                          <p className="text-sm text-muted-foreground leading-relaxed wrap-break-word">
                             {notification.message}
                           </p>
                           <span className="text-[12px] text-muted-foreground/60 mt-1.5">

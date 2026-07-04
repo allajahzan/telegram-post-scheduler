@@ -38,7 +38,16 @@ export function Navbar() {
     notifData?.pages.flatMap((p) => p.notifications).filter((n) => !n.is_read)
       .length ?? 0;
 
-  if (!user) return null;
+  if (!user)
+    return (
+      <header className="fixed inset-x-0 top-0 z-40 py-4 bg-background/20 backdrop-blur-xl border-b">
+        <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between px-6">
+          <Link href="/posts">
+            <LogoHeader />
+          </Link>
+        </div>
+      </header>
+    );
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 py-4 bg-background/20 backdrop-blur-xl border-b">

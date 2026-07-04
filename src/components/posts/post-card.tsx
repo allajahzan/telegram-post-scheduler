@@ -37,7 +37,7 @@ export function PostCard({ post, index, onEdit, onDelete }: PostCardProps) {
   const isPending = post.status === "pending";
 
   return (
-    <div className="group relative z-10 flex min-h-[260px] flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 shadow-2xl hover:shadow-lg hover:shadow-primary/5">
+    <div className="group flex min-h-[260px] flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 shadow-2xl hover:shadow-lg hover:shadow-primary/5">
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">

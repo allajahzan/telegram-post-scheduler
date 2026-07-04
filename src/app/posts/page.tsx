@@ -125,7 +125,7 @@ export default function DashboardPage() {
           {isLoading ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
               <Loader2 className="size-8 animate-spin mb-4 text-primary" />
-              <p>Loading your schedule...</p>
+              <p>Loading your scheduled posts...</p>
             </div>
           ) : (
             <>

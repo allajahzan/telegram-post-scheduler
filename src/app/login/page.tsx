@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ParticleBackground } from "@/components/ui/particle-bg";
 import { Loader2 } from "lucide-react";
 import { LinkedInIcon } from "@/components/common/linkedin-icon";
+import { Footer } from "@/components/layout/footer";
+import { Navbar } from "@/components/layout/navbar";
 
 export default function LoginPage() {
   const { data, isLoading } = useUser();
@@ -44,14 +46,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative p-5 min-h-screen flex flex-col items-center justify-between overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-between overflow-hidden">
       <ParticleBackground />
 
-      <div className="relative top-5">
-        <LogoHeader />
+      <div className="relative">
+        <Navbar />
       </div>
 
-      <div className="relative z-10 w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
+      <div className="mt-14 relative z-10 w-full max-w-lg p-5 animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-5">
         <p className="text-sm text-muted-foreground text-center font-medium">
           Schedule smarter & Post at the perfect moment.
         </p>
@@ -86,17 +88,14 @@ export default function LoginPage() {
           We never store your LinkedIn password.
           <br />
           By continuing, you agree to our{" "}
-          <Link href="/terms" className="text-blue-500 hover:underline">
+          <Link href="/" className="text-blue-500 hover:underline">
             Terms of Service
           </Link>
           .
         </p>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center font-medium">
-        © {new Date().getFullYear()} PostScheduler · Built with n8n + Gemini AI
-        · Not affiliated with LinkedIn
-      </p>
+      <Footer />
     </div>
   );
 }
