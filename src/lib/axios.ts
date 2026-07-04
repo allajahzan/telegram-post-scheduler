@@ -14,15 +14,17 @@ api.interceptors.response.use(
     // Optional: handle 401 globally, e.g. redirect to login
     const isUnauthorized = error.response?.status === 401;
     const isUserNotFound =
-      error.response?.status === 404 && error.config?.url === "/user/me";
+      error.response?.status === 404 && error.config?.url?.includes("/user/me");
 
     if (isUnauthorized || isUserNotFound) {
       if (
         typeof window !== "undefined" &&
-        !window.location.pathname.startsWith("/login") &&
-        !window.location.pathname.startsWith("/signup")
+        !window.location.pathname.startsWith("/login")
       ) {
-        window.location.replace("/login");
+        // Force logout to clear cookies if we got a 404/401
+        axios.post("/api/auth/logout").finally(() => {
+          window.location.replace("/login");
+        });
       }
     }
     return Promise.reject(error);
