@@ -125,7 +125,8 @@ export function Navbar() {
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
-                className="flex items-center gap-2.5 p-2 text-sm text-destructive cursor-pointer focus:bg-destructive/10 focus:text-destructive"
+                variant="destructive"
+                className="flex items-center gap-2.5 p-2 text-sm cursor-pointer"
                 onClick={() => logout.mutate()}
               >
                 <LogOut />
