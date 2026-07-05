@@ -60,7 +60,41 @@ export const useCreatePost = () => {
       const { data } = await api.post<{ post: Post }>("/posts", postData);
       return data.post;
     },
-    onSuccess: () => {
+    onSuccess: (newPost) => {
+      // Optimistically update user quota and counts
+      queryClient.setQueryData(["user"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          quota: {
+            ...old.quota,
+            used: old.quota.used + 1,
+          },
+          postCounts: {
+            ...old.postCounts,
+            pending: old.postCounts.pending + 1,
+          },
+        };
+      });
+
+      // Optimistically insert the new post at the top of the first page
+      queryClient.setQueryData(["posts", "pending"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any, index: number) => {
+            if (index === 0) {
+              return {
+                ...page,
+                posts: [newPost, ...page.posts],
+              };
+            }
+            return page;
+          }),
+        };
+      });
+
+      // Trigger background refetches to ensure 100% sync
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Post created successfully");
@@ -105,7 +139,36 @@ export const useDeletePost = () => {
     mutationFn: async (id: string) => {
       await api.delete(`/posts/${id}`);
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      // Optimistically update user quota and counts
+      queryClient.setQueryData(["user"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          quota: {
+            ...old.quota,
+            used: Math.max(0, old.quota.used - 1),
+          },
+          postCounts: {
+            ...old.postCounts,
+            pending: Math.max(0, old.postCounts.pending - 1),
+          },
+        };
+      });
+
+      // Optimistically remove the deleted post from the infinite query cache
+      queryClient.setQueryData(["posts", "pending"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            posts: page.posts.filter((post: any) => post._id !== id),
+          })),
+        };
+      });
+
+      // Trigger background refetches to ensure 100% sync
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Post deleted successfully");

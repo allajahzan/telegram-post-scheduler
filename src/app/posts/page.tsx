@@ -7,9 +7,11 @@ import { PostCard, EmptySlotCard } from "@/components/posts/post-card";
 import { CreatePostModal } from "@/components/posts/create-post-modal";
 import { EditPostModal } from "@/components/posts/edit-post-modal";
 import { DeleteConfirmModal } from "@/components/common/delete-confirm-modal";
+import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
-import { Plus, AlertTriangle, Loader2, FileText } from "lucide-react";
+import { Plus, AlertTriangle, Loader2 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Loader } from "@/components/ui/loader";
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"scheduled" | "published">(
@@ -152,13 +154,13 @@ export default function DashboardPage() {
         <div className="mt-8 flex items-center gap-5 border-b">
           <button
             onClick={() => setActiveTab("scheduled")}
-            className={`pb-1 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "scheduled" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            className={`pb-2 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "scheduled" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
           >
             Scheduled ({userData?.postCounts?.pending || 0})
           </button>
           <button
             onClick={() => setActiveTab("published")}
-            className={`pb-1 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "published" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            className={`pb-2 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "published" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
           >
             Published ({userData?.postCounts?.done || 0})
           </button>
@@ -167,9 +169,8 @@ export default function DashboardPage() {
         {/* Posts Grid */}
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isLoading ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <Loader2 className="size-8 animate-spin mb-4 text-primary" />
-              <p>Loading your posts...</p>
+            <div className="col-span-full flex items-center justify-center py-20">
+              <Loader />
             </div>
           ) : (
             <>
@@ -196,20 +197,13 @@ export default function DashboardPage() {
               {activeTab === "scheduled" &&
                 scheduledPosts.length === 0 &&
                 quota.used >= quota.limit && (
-                  <div className="col-span-full rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
-                    <p className="text-xs text-muted-foreground">
-                      You have filled all your post slots. {nextResetText || ""}
-                      .
-                    </p>
-                  </div>
+                  <EmptyState>
+                    You have filled all your post slots. {nextResetText || ""}.
+                  </EmptyState>
                 )}
 
               {activeTab === "published" && publishedPosts.length === 0 && (
-                <div className="col-span-full rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
-                  <p className="text-xs text-muted-foreground">
-                    You don't have any published posts yet.
-                  </p>
-                </div>
+                <EmptyState>You don't have any published posts yet.</EmptyState>
               )}
             </>
           )}

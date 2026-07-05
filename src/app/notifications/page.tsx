@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useEffect, Fragment } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { Loader } from "@/components/ui/loader";
+import { EmptyState } from "@/components/common/empty-state";
 
 export default function NotificationsPage() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -55,16 +57,13 @@ export default function NotificationsPage() {
 
         <div className="mt-8 space-y-4">
           {isLoading ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <Loader2 className="size-8 animate-spin mb-4 text-primary" />
-              <p>Loading your notifications...</p>
+            <div className="col-span-full flex items-center justify-center py-20">
+              <Loader />
             </div>
           ) : data?.pages[0].notifications.length === 0 ? (
-            <div className="col-span-full rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
-              <p className="text-xs text-muted-foreground">
-                You don't have any notifications yet.
-              </p>
-            </div>
+            <EmptyState>
+              You don't have any notifications yet.
+            </EmptyState>
           ) : (
             <>
               {data?.pages.map((page, i) => (
