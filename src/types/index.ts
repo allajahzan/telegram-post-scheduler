@@ -23,7 +23,6 @@ export interface PostDocument {
   generate_image: boolean;
   prompt?: string;
   status: "pending" | "done";
-  is_deleted?: boolean;
   created_at: Date;
   updated_at: Date;
 }

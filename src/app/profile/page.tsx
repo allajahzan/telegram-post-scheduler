@@ -243,7 +243,8 @@ export default function ProfilePage() {
                         This will permanently delete all your posts and data.
                         {quota && quota.used >= quota.limit && (
                           <div className="mt-2 text-amber-500 font-medium">
-                            Cannot delete account while your post quota is full.
+                            Cannot delete account while all your post slots are
+                            full.
                           </div>
                         )}
                       </div>

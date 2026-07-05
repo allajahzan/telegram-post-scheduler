@@ -174,7 +174,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
                     Generate Image with AI
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Pollination AI will design a matching visual
+                    AI will design a matching visual for your post
                   </p>
                 </div>
               </div>

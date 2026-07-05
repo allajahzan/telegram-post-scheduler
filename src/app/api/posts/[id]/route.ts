@@ -124,18 +124,28 @@ export async function DELETE(
 
     const db = await getDb();
 
-    const result = await db
-      .collection("posts")
-      .updateOne(
-        { _id: new ObjectId(id), user_id: new ObjectId(session.userId) },
-        { $set: { is_deleted: true, updated_at: new Date() } },
-      );
+    // Verify ownership and status
+    const existingPost = await db.collection("posts").findOne({
+      _id: new ObjectId(id),
+      user_id: new ObjectId(session.userId),
+    });
 
-    if (result.matchedCount === 0) {
+    if (!existingPost) {
       return NextResponse.json(
         { message: "Post not found or unauthorized" },
         { status: 404 },
       );
+    }
+
+    if (existingPost.status === "done") {
+      return NextResponse.json(
+        { message: "Cannot delete a post that has already been published" },
+        { status: 403 },
+      );
+    }
+
+    if (existingPost.status === "pending") {
+      await db.collection("posts").deleteOne({ _id: new ObjectId(id) });
     }
 
     return NextResponse.json({ success: true });

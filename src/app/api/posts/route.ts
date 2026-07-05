@@ -8,7 +8,7 @@ import {
   checkImageAccessible,
 } from "@/lib/validation";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getSession();
 
@@ -16,17 +16,40 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "9"); // default limit 2 for testing
+    const skip = (page - 1) * limit;
+
+    const query: any = {
+      user_id: new ObjectId(session.userId),
+    };
+
+    if (status === "pending" || status === "done") {
+      query.status = status;
+    }
+
     const db = await getDb();
+    const total = await db.collection("posts").countDocuments(query);
+
     const posts = await db
       .collection<PostDocument>("posts")
-      .find({
-        user_id: new ObjectId(session.userId),
-        is_deleted: { $ne: true },
-      })
+      .find(query)
       .sort({ created_at: 1 }) // Sort by creation time ascending
+      .skip(skip)
+      .limit(limit)
       .toArray();
 
-    return NextResponse.json({ posts });
+    return NextResponse.json({
+      posts,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error("Fetch posts error:", error);
     return NextResponse.json(
@@ -97,7 +120,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message:
-            "You have reached your limit of 3 posts per 72 hours. Please wait until your quota resets.",
+            "You have used all your post slots. Please wait for a slot to free up.",
         },
         { status: 403 },
       );

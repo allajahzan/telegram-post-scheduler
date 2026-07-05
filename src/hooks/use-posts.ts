@@ -1,4 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 
@@ -14,13 +18,37 @@ export interface Post {
   status: "pending" | "done";
 }
 
-export const usePosts = () => {
-  return useQuery({
-    queryKey: ["posts"],
-    queryFn: async () => {
-      const { data } = await api.get<{ posts: Post[] }>("/posts");
-      return data.posts;
+interface PostsResponse {
+  posts: Post[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export const usePosts = (
+  status: "pending" | "done",
+  enabled: boolean = true,
+) => {
+  return useInfiniteQuery({
+    queryKey: ["posts", status],
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data } = await api.get<PostsResponse>(
+        `/posts?status=${status}&page=${pageParam}&limit=9`,
+      );
+      return data;
     },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    enabled,
+    staleTime: 0,
   });
 };
 
@@ -79,6 +107,7 @@ export const useDeletePost = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Post deleted successfully");
     },
     onError: (error: any) => {

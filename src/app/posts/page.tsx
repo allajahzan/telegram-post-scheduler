@@ -8,13 +8,30 @@ import { CreatePostModal } from "@/components/posts/create-post-modal";
 import { EditPostModal } from "@/components/posts/edit-post-modal";
 import { DeleteConfirmModal } from "@/components/common/delete-confirm-modal";
 import { Button } from "@/components/ui/button";
-import { Plus, AlertTriangle, Loader2 } from "lucide-react";
+import { Plus, AlertTriangle, Loader2, FileText } from "lucide-react";
 import { useState, useMemo } from "react";
 
-const MAX_SLOTS = 3;
-
 export default function DashboardPage() {
-  const { data: posts, isLoading: isPostsLoading } = usePosts();
+  const [activeTab, setActiveTab] = useState<"scheduled" | "published">(
+    "scheduled",
+  );
+
+  const {
+    data: scheduledData,
+    isLoading: isScheduledLoading,
+    fetchNextPage: fetchNextScheduled,
+    hasNextPage: hasNextScheduled,
+    isFetchingNextPage: isFetchingNextScheduled,
+  } = usePosts("pending", activeTab === "scheduled");
+
+  const {
+    data: publishedData,
+    isLoading: isPublishedLoading,
+    fetchNextPage: fetchNextPublished,
+    hasNextPage: hasNextPublished,
+    isFetchingNextPage: isFetchingNextPublished,
+  } = usePosts("done", activeTab === "published");
+
   const deletePost = useDeletePost();
   const { data: userData, isLoading: isUserLoading } = useUser();
 
@@ -22,13 +39,22 @@ export default function DashboardPage() {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [deletingPost, setDeletingPost] = useState<Post | null>(null);
 
+  const scheduledPosts = useMemo(
+    () => scheduledData?.pages.flatMap((p) => p.posts) || [],
+    [scheduledData],
+  );
+
+  const publishedPosts = useMemo(
+    () => publishedData?.pages.flatMap((p) => p.posts) || [],
+    [publishedData],
+  );
+
   const quota = userData?.quota || {
     used: 0,
-    limit: MAX_SLOTS,
+    limit: 3,
     next_reset_at: null,
   };
   const isLimitReached = quota.used >= quota.limit;
-  const emptySlots = Math.max(0, MAX_SLOTS - (posts?.length || 0));
 
   const tokenWarning = useMemo(() => {
     const expiresAt = userData?.user?.linkedin_token_expires_at;
@@ -50,12 +76,14 @@ export default function DashboardPage() {
     );
     if (hoursLeft > 24) {
       const days = Math.floor(hoursLeft / 24);
-      return `Quota resets in ${days} ${days === 1 ? "day" : "days"}`;
+      return `Next slot frees up in ${days} ${days === 1 ? "day" : "days"}`;
     }
-    return `Quota resets in ${hoursLeft} ${hoursLeft === 1 ? "hour" : "hours"}`;
+    return `Next slot frees up in ${hoursLeft} ${hoursLeft === 1 ? "hour" : "hours"}`;
   }, [isLimitReached, quota.next_reset_at]);
 
-  const isLoading = isPostsLoading || isUserLoading;
+  const isLoading =
+    (activeTab === "scheduled" ? isScheduledLoading : isPublishedLoading) ||
+    isUserLoading;
 
   const openCreate = () => {
     setEditingPost(null);
@@ -113,23 +141,42 @@ export default function DashboardPage() {
               Schedule Post
             </Button>
             {isLimitReached && (
-              <div className="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-max max-w-xs rounded-full border bg-card px-2 py-2 text-xs text-muted-foreground font-medium shadow-lg group-hover/btn:block">
+              <div className="pointer-events-none absolute right-0 top-full z-10 mt-2 hidden w-max max-w-xs rounded-full border bg-card px-3 py-2 text-xs text-muted-foreground font-medium shadow-lg group-hover/btn:block">
                 {nextResetText || ""}
               </div>
             )}
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="mt-8 flex items-center gap-5 border-b">
+          <button
+            onClick={() => setActiveTab("scheduled")}
+            className={`pb-1 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "scheduled" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+          >
+            Scheduled ({userData?.postCounts?.pending || 0})
+          </button>
+          <button
+            onClick={() => setActiveTab("published")}
+            className={`pb-1 text-sm font-medium transition-colors border-b-2 cursor-pointer ${activeTab === "published" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+          >
+            Published ({userData?.postCounts?.done || 0})
+          </button>
+        </div>
+
         {/* Posts Grid */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {isLoading ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-muted-foreground">
               <Loader2 className="size-8 animate-spin mb-4 text-primary" />
-              <p>Loading your scheduled posts...</p>
+              <p>Loading your posts...</p>
             </div>
           ) : (
             <>
-              {posts?.map((post, index) => (
+              {(activeTab === "scheduled"
+                ? scheduledPosts
+                : publishedPosts
+              ).map((post, index) => (
                 <PostCard
                   key={post._id}
                   post={post}
@@ -139,12 +186,68 @@ export default function DashboardPage() {
                 />
               ))}
 
-              {Array.from({ length: emptySlots }).map((_, i) => (
-                <EmptySlotCard key={`empty-${i}`} onClick={openCreate} />
-              ))}
+              {activeTab === "scheduled" &&
+                Array.from({
+                  length: Math.max(0, quota.limit - quota.used),
+                }).map((_, i) => (
+                  <EmptySlotCard key={`empty-${i}`} onClick={openCreate} />
+                ))}
+
+              {activeTab === "scheduled" &&
+                scheduledPosts.length === 0 &&
+                quota.used >= quota.limit && (
+                  <div className="col-span-full rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
+                    <p className="text-xs text-muted-foreground">
+                      You have filled all your post slots. {nextResetText || ""}
+                      .
+                    </p>
+                  </div>
+                )}
+
+              {activeTab === "published" && publishedPosts.length === 0 && (
+                <div className="col-span-full rounded-2xl border border-dashed border-border bg-secondary/30 p-8 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    You don't have any published posts yet.
+                  </p>
+                </div>
+              )}
             </>
           )}
         </div>
+
+        {/* Load More Button */}
+        {!isLoading &&
+          (activeTab === "scheduled" ? hasNextScheduled : hasNextPublished) && (
+            <div className="mt-8 flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  activeTab === "scheduled"
+                    ? fetchNextScheduled()
+                    : fetchNextPublished()
+                }
+                disabled={
+                  activeTab === "scheduled"
+                    ? isFetchingNextScheduled
+                    : isFetchingNextPublished
+                }
+                className="min-w-[140px]"
+              >
+                {(
+                  activeTab === "scheduled"
+                    ? isFetchingNextScheduled
+                    : isFetchingNextPublished
+                ) ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Load More"
+                )}
+              </Button>
+            </div>
+          )}
       </div>
 
       <CreatePostModal

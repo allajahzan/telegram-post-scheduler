@@ -64,7 +64,24 @@ export async function GET() {
 
     const quota = { used, limit, next_reset_at };
 
-    return NextResponse.json({ user, quota });
+    // Get total counts for UI tabs
+    const [pendingCount, doneCount] = await Promise.all([
+      db.collection("posts").countDocuments({
+        user_id: new ObjectId(session.userId),
+        status: "pending",
+      }),
+      db.collection("posts").countDocuments({
+        user_id: new ObjectId(session.userId),
+        status: "done",
+      }),
+    ]);
+
+    const postCounts = {
+      pending: pendingCount,
+      done: doneCount,
+    };
+
+    return NextResponse.json({ user, quota, postCounts });
   } catch (error) {
     console.error("User me error:", error);
     return NextResponse.json(

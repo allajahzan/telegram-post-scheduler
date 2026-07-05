@@ -13,11 +13,7 @@ export const useUpdateName = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      // Optimistically update or just invalidate
-      queryClient.setQueryData(["user"], (oldData: User | undefined) => {
-        if (!oldData) return oldData;
-        return { ...oldData, name: data.name };
-      });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Name updated successfully");
     },
     onError: (error: any) => {
@@ -25,22 +21,6 @@ export const useUpdateName = () => {
     },
   });
 };
-
-export const useUpdatePassword = () => {
-  return useMutation({
-    mutationFn: async (data: Record<string, string>) => {
-      const res = await api.patch("/user/update-password", data);
-      return res.data;
-    },
-    onSuccess: () => {
-      toast.success("Password updated successfully");
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update password");
-    },
-  });
-};
-
 export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
   const router = useRouter();

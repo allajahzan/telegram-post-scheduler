@@ -1,5 +1,9 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/axios';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import api from "@/lib/axios";
 
 export interface Notification {
   _id: string;
@@ -25,9 +29,11 @@ interface NotificationsResponse {
 
 export const useNotifications = () => {
   return useInfiniteQuery({
-    queryKey: ['notifications'],
+    queryKey: ["notifications"],
     queryFn: async ({ pageParam = 1 }) => {
-      const { data } = await api.get<NotificationsResponse>(`/notifications?page=${pageParam}&limit=10`);
+      const { data } = await api.get<NotificationsResponse>(
+        `/notifications?page=${pageParam}&limit=9`,
+      );
       return data;
     },
     getNextPageParam: (lastPage) => {
@@ -37,6 +43,7 @@ export const useNotifications = () => {
       return undefined;
     },
     initialPageParam: 1,
+    // staleTime: 0,
   });
 };
 
@@ -45,10 +52,10 @@ export const useMarkNotificationsRead = () => {
 
   return useMutation({
     mutationFn: async () => {
-      await api.patch('/notifications');
+      await api.patch("/notifications");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
   });
 };

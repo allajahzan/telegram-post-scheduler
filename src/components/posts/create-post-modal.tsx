@@ -156,7 +156,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                     Generate Image with AI
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Ai will design a matching visual for your post
+                    AI will design a matching visual for your post
                   </p>
                 </div>
               </div>

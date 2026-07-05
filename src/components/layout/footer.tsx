@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 sm:flex-row">
         <p className="text-xs font-medium text-muted-foreground text-center sm:text-left">
           © {new Date().getFullYear()} PostScheduler · Built with n8n + Gemini +
-          pollinations.ai
+          Pollinations.ai
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-3">

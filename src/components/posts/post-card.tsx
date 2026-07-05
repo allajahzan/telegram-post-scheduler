@@ -49,20 +49,20 @@ export function PostCard({ post, index, onEdit, onDelete }: PostCardProps) {
       {/* Content — clickable to edit */}
       <button
         onClick={() => isPending && onEdit(post)}
-        disabled={!isPending}
-        className="h-full flex flex-col gap-2 items-start disabled:cursor-default"
+        // disabled={!isPending}
+        className="h-full flex flex-col gap-2 items-start text-start disabled:cursor-default"
       >
         <h3 className="line-clamp-2 text-sm font-semibold text-foreground">
           {post.title}
         </h3>
-        <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+        <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
           {post.description}
         </p>
       </button>
 
       {/* Footer */}
       <div className="mt-4 border-t border-border pt-3">
-        <div className="flex flex-wrap items-center gap-3 text-[11px]">
+        <div className="flex flex-wrap items-center gap-3 text-xs">
           <span className="inline-flex items-center gap-1.5 text-muted-foreground">
             <Calendar size={12} />
             <span className="font-mono">{post.date}</span>
@@ -85,7 +85,7 @@ export function PostCard({ post, index, onEdit, onDelete }: PostCardProps) {
             variant="ghost"
             size="sm"
             onClick={() => onEdit(post)}
-            disabled={!isPending}
+            // disabled={!isPending}
             title={!isPending ? "Cannot edit a published post" : "Edit post"}
             className="text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
@@ -96,6 +96,9 @@ export function PostCard({ post, index, onEdit, onDelete }: PostCardProps) {
             variant="ghost"
             size="sm"
             onClick={() => onDelete(post)}
+            title={
+              !isPending ? "Cannot delete a published post" : "Delete post"
+            }
             className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2 />

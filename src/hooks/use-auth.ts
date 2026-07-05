@@ -17,15 +17,24 @@ export interface Quota {
   next_reset_at: string | null;
 }
 
+export interface PostCounts {
+  pending: number;
+  done: number;
+}
+
 export const useUser = () => {
   return useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data } = await api.get<{ user: User; quota: Quota }>("/user/me");
+      const { data } = await api.get<{
+        user: User;
+        quota: Quota;
+        postCounts: PostCounts;
+      }>("/user/me");
       return data;
     },
     retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 };
 
