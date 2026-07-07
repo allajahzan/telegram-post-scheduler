@@ -84,7 +84,7 @@ export default function SuggestionsPage() {
             </EmptyState>
           ) : data?.pages[0].suggestions.length === 0 ? (
             <EmptyState>
-              No suggestions found for your topics yet. Check back later!
+              You're all caught up! New suggestions arrive every morning.
             </EmptyState>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
