@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "8");
+    const limit = parseInt(searchParams.get("limit") || "9");
     const filterTopic = searchParams.get("topic");
     const skip = (page - 1) * limit;
 

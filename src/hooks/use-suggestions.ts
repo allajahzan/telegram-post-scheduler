@@ -29,7 +29,7 @@ export const useSuggestions = (topic?: string) => {
     queryFn: async ({ pageParam = 1 }) => {
       const url = new URL("/suggestions", window.location.origin);
       url.searchParams.append("page", pageParam.toString());
-      url.searchParams.append("limit", "8");
+      url.searchParams.append("limit", "9");
       if (topic && topic !== "All") {
         url.searchParams.append("topic", topic);
       }
