@@ -1,5 +1,5 @@
-import { ClockFadingIcon, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LinkedInIcon } from "../common/linkedin-icon";
 
 interface Props {
   iconClassName?: string;
@@ -14,11 +14,11 @@ export function LogoHeader({ iconClassName }: Props) {
           iconClassName,
         )}
       >
-        <ClockFadingIcon className="size-5 text-white" />
+        <LinkedInIcon className="size-5 shadow-lg" />
       </div>
 
       <div className="text-start">
-        <h1 className="text-lg font-extrabold tracking-tight text-foreground leading-none">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground leading-none">
           Post Scheduler
         </h1>
         <p className="text-[10px] sm:text-[11px] font-medium tracking-widest text-muted-foreground">

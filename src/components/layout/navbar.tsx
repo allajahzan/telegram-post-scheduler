@@ -46,7 +46,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: notifData } = useNotifications();
+  const { data: notifData } = useNotifications(!!user);
 
   const unread =
     notifData?.pages.flatMap((p) => p.notifications).filter((n) => !n.is_read)

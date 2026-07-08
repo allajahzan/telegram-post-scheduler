@@ -27,9 +27,10 @@ interface NotificationsResponse {
   };
 }
 
-export const useNotifications = () => {
+export const useNotifications = (enabled: boolean = true) => {
   return useInfiniteQuery({
     queryKey: ["notifications"],
+    enabled,
     queryFn: async ({ pageParam = 1 }) => {
       const { data } = await api.get<NotificationsResponse>(
         `/notifications?page=${pageParam}&limit=9`,
