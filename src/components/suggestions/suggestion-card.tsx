@@ -12,7 +12,7 @@ interface SuggestionCardProps {
 
 export function SuggestionCard({ suggestion, onUse }: SuggestionCardProps) {
   return (
-    <div className="group relative p-5 flex flex-col justify-between overflow-hidden bg-linear-to-b from-card to-card/50 border border-primary/10 rounded-2xl shadow-sm transition-all hover:border-primary/30 hover:shadow-lg">
+    <div className="group flex min-h-[260px] flex-col gap-5 justify-between rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary/40 shadow-2xl hover:shadow-lg hover:shadow-primary/5">
       <div className="relative z-10 space-y-2">
         <div className="mb-5 flex items-center justify-between">
           <AppBadge className="">{suggestion.topic}</AppBadge>
@@ -30,7 +30,7 @@ export function SuggestionCard({ suggestion, onUse }: SuggestionCardProps) {
         </p>
       </div>
 
-      <div className="relative z-10 mt-4 pt-4 flex items-center justify-between gap-3 border-t border-border/50">
+      <div className="relative z-10 pt-5 flex items-center justify-between gap-3 border-t border-border/50">
         {suggestion.based_on ? (
           <a
             href={suggestion.based_on}

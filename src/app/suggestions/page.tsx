@@ -67,7 +67,7 @@ export default function SuggestionsPage() {
             <div className="mt-8 flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedTopicFilter("All")}
-                className={`rounded-full px-3 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                className={`rounded-full px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
                   selectedTopicFilter === "All"
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -79,7 +79,7 @@ export default function SuggestionsPage() {
                 <button
                   key={topic}
                   onClick={() => setSelectedTopicFilter(topic)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
                     selectedTopicFilter === topic
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
